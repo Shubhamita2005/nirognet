@@ -1,6 +1,4 @@
-from flask import Blueprint #A Blueprint is a way to organize Flask applications into modules eg: auth_routes, emergency_chat_routes etc.
-from flask_jwt_extended import jwt_required # imports the jwt_required decorator from Flask-JWT-Extended to protect routes so that only authenticated users with a valid JWT token can access them
-#This imports functions from the controller layer, the controller layer contain the business logic.
+from flask import Blueprint
 from app.controllers.auth_controller import (
     register,
     login,
@@ -10,13 +8,55 @@ from app.controllers.auth_controller import (
     change_password
 )
 
-auth_bp = Blueprint("auth", __name__) #Creates a Blueprint object named "auth", used internally by flask. auth: the name of the blueprint, __name__ : the current python module name. Flask uses this to locate files and template. all routes defined using auth_bp belong to the authentication module
+auth_bp = Blueprint("auth", __name__)
 
-# defines API routes for register, login, profile access, health update, and password change, with some routes protected using jwt_required so only authenticated users can access them in Flask
-auth_bp.route("/api/register", methods=["POST"])(register)
-auth_bp.route("/api/login", methods=["POST"])(login)
+# -----------------------
+# Auth Routes
+# -----------------------
 
-auth_bp.route("/api/profile", methods=["GET"])(jwt_required()(get_profile))
-auth_bp.route("/api/profile", methods=["PUT"])(jwt_required()(update_profile))
-auth_bp.route("/api/profile/health", methods=["PUT"])(jwt_required()(update_health))
-auth_bp.route("/api/change-password", methods=["PUT"])(jwt_required()(change_password))
+# Register
+@auth_bp.route("/api/register", methods=["POST"])
+def register_route():
+    return register()
+
+
+# Login
+@auth_bp.route("/api/login", methods=["POST"])
+def login_route():
+    return login()
+
+
+# -----------------------
+# Profile Routes
+# -----------------------
+
+# Get Profile
+@auth_bp.route("/api/profile", methods=["GET"])
+def profile_route():
+    return get_profile()
+
+
+# Update Profile
+@auth_bp.route("/api/profile", methods=["PUT"])
+def update_profile_route():
+    return update_profile()
+
+
+# -----------------------
+# Health Routes
+# -----------------------
+
+# Update Health Info
+@auth_bp.route("/api/profile/health", methods=["PUT"])
+def update_health_route():
+    return update_health()
+
+
+# -----------------------
+# Password Routes
+# -----------------------
+
+# Change Password
+@auth_bp.route("/api/change-password", methods=["PUT"])
+def change_password_route():
+    return change_password()

@@ -31,7 +31,16 @@ class User(db.Model):
         return {
             "id": self.id,
             "email": self.email,
-            "name": self.name
+            "name": self.name,
+
+            # 🔥 NEW CHANGE: Added missing fields so frontend receives full profile data
+            "age": self.age,
+            "gender": self.gender,
+            "contact": self.contact,
+            "address": self.address,
+            "blood_group": self.blood_group,
+            "blood_pressure": self.blood_pressure,
+            "language": self.language,
         }
 
 
