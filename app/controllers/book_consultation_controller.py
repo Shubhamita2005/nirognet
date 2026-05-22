@@ -1,14 +1,28 @@
 from flask import request, jsonify
-from flask_jwt_extended import get_jwt_identity
+# from flask_jwt_extended import get_jwt_identity
 from app.services.book_consultation_services import (
     list_specialties,
     list_doctors_flat,
     create_consultation,
     list_user_consultations,
     get_available_slots,
-    update_consultation_type_service
+    update_consultation_type_service,
 )
 from datetime import datetime
+
+from flask_jwt_extended import verify_jwt_in_request, get_jwt_identity
+
+def get_user_id_with_fallback(default_user_id=1):
+    """
+    If JWT exists → use real user.
+    If no JWT → fallback to default_user_id.
+    """
+    try:
+        verify_jwt_in_request(optional=True)
+        identity = get_jwt_identity()
+        return int(identity) if identity else default_user_id
+    except:
+        return default_user_id
 
 # -----------------------
 # Get all specialties
@@ -31,10 +45,7 @@ def create_consultation_controller():
     data = request.get_json() or {}
 
     # 🔥 TEMP JWT BYPASS (for testing)
-    try:
-        user_id = int(get_jwt_identity())
-    except:
-        user_id = 2
+    user_id = get_user_id_with_fallback(1)
 
     doctor_id = data.get("doctor_id")
     date_time_str = data.get("date_time")
@@ -97,10 +108,7 @@ def update_consultation_type(consultation_id: int):
     data = request.get_json() or {}
 
     # 🔥 TEMP JWT BYPASS (same as before)
-    try:
-        user_id = int(get_jwt_identity())
-    except:
-        user_id = 1
+    user_id = get_user_id_with_fallback(1)
 
     appointment_type_id = data.get("appointment_type_id")
 
@@ -122,3 +130,26 @@ def update_consultation_type(consultation_id: int):
         "msg": "Appointment type updated successfully",
         "consultation": consultation
     }), 200
+def create_payment():
+    data = request.get_json() or {}
+
+    consultation_id = data.get("consultation_id")
+
+    if not consultation_id:
+        return jsonify({"msg": "consultation_id is required"}), 400
+
+    # 🔥 TEMP JWT BYPASS
+    try:
+        user_id = int(get_jwt_identity())
+    except:
+        user_id = 1
+
+    payment, error = create_payment_service(consultation_id, user_id)
+
+    if error:
+        return jsonify({"msg": error}), 400
+
+    return jsonify({
+        "msg": "Payment created",
+        "payment": payment
+    }), 201
