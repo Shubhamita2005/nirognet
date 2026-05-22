@@ -6,7 +6,9 @@ from app.services.book_consultation_services import (
     create_consultation,
     list_user_consultations,
     get_available_slots,
-    update_consultation_type_service
+    update_consultation_type_service,
+    create_payment_service,
+    verify_payment_service
 )
 from datetime import datetime
 
@@ -121,4 +123,57 @@ def update_consultation_type(consultation_id: int):
     return jsonify({
         "msg": "Appointment type updated successfully",
         "consultation": consultation
+    }), 200
+def create_payment():
+    data = request.get_json() or {}
+
+    consultation_id = data.get("consultation_id")
+
+    if not consultation_id:
+        return jsonify({"msg": "consultation_id is required"}), 400
+
+    # 🔥 TEMP JWT BYPASS
+    try:
+        user_id = int(get_jwt_identity())
+    except:
+        user_id = 1
+
+    payment, error = create_payment_service(consultation_id, user_id)
+
+    if error:
+        return jsonify({"msg": error}), 400
+
+    return jsonify({
+        "msg": "Payment created",
+        "payment": payment
+    }), 201
+def verify_payment():
+    data = request.get_json() or {}
+
+    consultation_id = data.get("consultation_id")
+    razorpay_order_id = data.get("razorpay_order_id")
+    razorpay_payment_id = data.get("razorpay_payment_id")
+    razorpay_signature = data.get("razorpay_signature")
+
+    if not all([
+        consultation_id,
+        razorpay_order_id,
+        razorpay_payment_id,
+        razorpay_signature
+    ]):
+        return jsonify({"msg": "Missing payment verification fields"}), 400
+
+    payment, error = verify_payment_service(
+        consultation_id,
+        razorpay_order_id,
+        razorpay_payment_id,
+        razorpay_signature
+    )
+
+    if error:
+        return jsonify({"msg": error}), 400
+
+    return jsonify({
+        "msg": "Payment successful",
+        "payment": payment
     }), 200

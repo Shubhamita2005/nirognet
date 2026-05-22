@@ -6,7 +6,9 @@ from app.controllers.book_consultation_controller import (
     get_doctor_slots,
     create_consultation_controller,
     get_my_consultations,
-    update_consultation_type
+    update_consultation_type, 
+    create_payment,
+    verify_payment
 )
 
 book_bp = Blueprint("book_consultation", __name__)
@@ -21,3 +23,5 @@ book_bp.route("/api/consultations", methods=["POST"])((create_consultation_contr
 book_bp.route("/api/consultations/<consultation_id>/type", methods=["PUT"])((update_consultation_type))
 
 book_bp.route("/api/consultations", methods=["GET"])(jwt_required()(get_my_consultations))
+book_bp.route("/api/payments/create",methods=["POST"])(create_payment)
+book_bp.route("/api/payments/verify",methods=["POST"])(verify_payment)

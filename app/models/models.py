@@ -144,3 +144,38 @@ class Medicine(db.Model):
     category = db.Column(db.String(100))
     description = db.Column(db.Text)
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
+
+# =========================
+# Payment
+# =========================
+class Payment(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+
+    consultation_id = db.Column(
+        db.Integer,
+        db.ForeignKey("consultation.id"),
+        nullable=False
+    )
+
+    amount = db.Column(db.Integer, nullable=False)
+    status = db.Column(db.String(20), default="pending")
+
+    razorpay_order_id = db.Column(db.String(255))
+    razorpay_payment_id = db.Column(db.String(255))
+
+    payment_method = db.Column(db.String(50))
+
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+
+    consultation = db.relationship("Consultation", backref="payments")
+
+    def to_dict(self):
+        return {
+            "id": self.id,
+            "consultation_id": self.consultation_id,
+            "amount": self.amount,
+            "status": self.status,
+            "transaction_id": self.transaction_id,
+            "payment_method": self.payment_method,
+            "created_at": self.created_at.isoformat()
+        }
