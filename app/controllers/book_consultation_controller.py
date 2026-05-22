@@ -7,6 +7,8 @@ from app.services.book_consultation_services import (
     list_user_consultations,
     get_available_slots,
     update_consultation_type_service,
+    create_payment_service,
+    verify_payment_service
 )
 from datetime import datetime
 
@@ -153,3 +155,34 @@ def create_payment():
         "msg": "Payment created",
         "payment": payment
     }), 201
+    }), 201
+def verify_payment():
+    data = request.get_json() or {}
+
+    consultation_id = data.get("consultation_id")
+    razorpay_order_id = data.get("razorpay_order_id")
+    razorpay_payment_id = data.get("razorpay_payment_id")
+    razorpay_signature = data.get("razorpay_signature")
+
+    if not all([
+        consultation_id,
+        razorpay_order_id,
+        razorpay_payment_id,
+        razorpay_signature
+    ]):
+        return jsonify({"msg": "Missing payment verification fields"}), 400
+
+    payment, error = verify_payment_service(
+        consultation_id,
+        razorpay_order_id,
+        razorpay_payment_id,
+        razorpay_signature
+    )
+
+    if error:
+        return jsonify({"msg": error}), 400
+
+    return jsonify({
+        "msg": "Payment successful",
+        "payment": payment
+    }), 200

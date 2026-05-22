@@ -1,6 +1,15 @@
-from app.models import Specialty, Doctor, DoctorSchedule, Hospital, Consultation
+from app.models import Specialty, Doctor, DoctorSchedule, Hospital, Consultation, Payment
 from app.extensions import db
 from datetime import datetime, timedelta, date as dt_date
+import os
+import razorpay
+
+client = razorpay.Client(
+    auth=(
+        os.getenv("RAZORPAY_KEY_ID"),
+        os.getenv("RAZORPAY_KEY_SECRET")
+    )
+)
 
 # -----------------------
 # List all specialties
@@ -181,4 +190,94 @@ def update_consultation_type_service(consultation_id, user_id, appointment_type_
         "appointment_type_id": consultation.appointment_type_id,
         "date_time": consultation.date_time.isoformat(),
         "status": consultation.status
+    }, None
+
+def create_payment_service(consultation_id, user_id):
+
+    # 1. Check consultation exists
+    consultation = Consultation.query.get(consultation_id)
+    if not consultation:
+        return None, "Consultation not found"
+
+    # 2. Check ownership
+    if consultation.user_id != user_id:
+        return None, "Unauthorized"
+
+    # 3. Decide amount (simple fixed for now)
+    amount = 500  # ₹500 (you can change later)
+    order = client.order.create({
+    "amount": amount * 100,
+    "currency": "INR",
+    "payment_capture": 1
+})
+    # 4. Create payment record
+    payment = Payment(
+    consultation_id=consultation_id,
+    amount=amount,
+    status="pending",
+    razorpay_order_id=order["id"]
+)
+
+    db.session.add(payment)
+    db.session.commit()
+
+    # 5. Return response
+    return {
+    "payment_id": payment.id,
+    "consultation_id": payment.consultation_id,
+    "amount": payment.amount,
+    "status": payment.status,
+    "razorpay_order_id": order["id"],
+    "key": os.getenv("RAZORPAY_KEY_ID")
+}, None
+def verify_payment_service(
+    consultation_id,
+    razorpay_order_id,
+    razorpay_payment_id,
+    razorpay_signature
+):
+
+    # 1. Get consultation
+    consultation = Consultation.query.get(consultation_id)
+
+    if not consultation:
+        return None, "Consultation not found"
+
+    # 2. Get latest payment for this consultation
+    payment = Payment.query.filter_by(
+        consultation_id=consultation_id
+    ).order_by(Payment.id.desc()).first()
+
+    if not payment:
+        return None, "Payment not found"
+
+    # 3. Verify Razorpay signature
+    params_dict = {
+        "razorpay_order_id": razorpay_order_id,
+        "razorpay_payment_id": razorpay_payment_id,
+        "razorpay_signature": razorpay_signature
+    }
+
+    try:
+        client.utility.verify_payment_signature(params_dict)
+
+    except:
+        return None, "Payment verification failed"
+
+    # 4. Update payment details
+    payment.status = "success"
+    payment.razorpay_payment_id = razorpay_payment_id
+
+    # 5. Confirm consultation
+    consultation.status = "confirmed"
+
+    # 6. Save changes
+    db.session.commit()
+
+    # 7. Return response
+    return {
+        "payment_id": payment.id,
+        "consultation_id": consultation.id,
+        "status": payment.status,
+        "razorpay_payment_id": payment.razorpay_payment_id
     }, None
