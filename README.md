@@ -355,4 +355,4 @@ NirogNet was developed as a team project.
 
 ## Repository
 
-https://github.com/Shubhamita2005/nirognet_backend
+https://github.com/Shubhamita2005/nirognet
