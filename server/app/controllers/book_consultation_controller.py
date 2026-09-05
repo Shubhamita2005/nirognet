@@ -155,7 +155,7 @@ def create_payment():
         "msg": "Payment created",
         "payment": payment
     }), 201
-    }), 201
+
 def verify_payment():
     data = request.get_json() or {}
 
