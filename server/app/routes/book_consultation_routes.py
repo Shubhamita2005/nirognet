@@ -20,7 +20,7 @@ book_bp.route("/api/specialties/<int:specialty_id>/doctors",methods=["GET"])((ge
 book_bp.route("/api/doctors/<int:doctor_id>/slots", methods=["GET"])(get_doctor_slots)#slot for a specific doctor.
 # Auth required
 book_bp.route("/api/consultations", methods=["POST"])((create_consultation_controller))
-book_bp.route("/api/consultations/<consultation_id>/type", methods=["PUT"])((update_consultation_type))
+book_bp.route("/api/consultations/<int:consultation_id>/type", methods=["PUT"]) (update_consultation_type)
 
 book_bp.route("/api/consultations", methods=["GET"])(jwt_required()(get_my_consultations))
 book_bp.route("/api/payments/create",methods=["POST"])(create_payment)

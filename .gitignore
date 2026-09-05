@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 ﻿# ==============================================================================
 # NirogNet Root .gitignore
 # Covers: Python (Flask) Backend, Flutter/Dart Client, Database, Secrets, IDEs, OS
@@ -163,3 +164,24 @@ $RECYCLE.BIN/
 # ------------------------------------------------------------------------------
 .zencoder/
 .zenflow/
+=======
+# Virtual Environment
+venv/
+
+# Python cache
+*.pyc
+__pycache__/
+
+# Environment variables
+.env
+
+# Database files
+*.db
+*.sqlite
+*.sqlite3
+
+# IDE and OS files
+.vscode/
+.idea/
+.DS_Store
+>>>>>>> origin/main
