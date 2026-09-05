@@ -1,4 +1,4 @@
-﻿# NirogNet
+# NirogNet
 
 **NirogNet** is a healthcare platform built to make medical services more accessible — particularly for underserved and rural communities in India. It connects patients with doctors, provides AI-assisted health guidance, and enables digital consultation booking and payment.
 
@@ -346,6 +346,7 @@ NirogNet was developed as a team project.
 
 | Name | LinkedIn |
 |---|---|
+| Parthiv Ghosh | https://www.linkedin.com/in/parthiv-ghosh-479a7b275 |
 | Shubhamita Majumder | https://www.linkedin.com/in/shubhamita-majumder-69264b30a/ |
 | Neha Pani | https://www.linkedin.com/in/neha-pani/ |
 | Protyush Banik | https://www.linkedin.com/in/protyush-banik/ |

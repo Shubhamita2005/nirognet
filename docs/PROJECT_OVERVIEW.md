@@ -1,4 +1,4 @@
-﻿# NirogNet — Project Overview
+# NirogNet — Project Overview
 
 ## Problem Statement
 
@@ -237,6 +237,7 @@ NirogNet was developed as a collaborative student project.
 
 | Name | LinkedIn |
 |---|---|
+| Parthiv Ghosh | https://www.linkedin.com/in/parthiv-ghosh-479a7b275 |
 | Shubhamita Majumder | https://www.linkedin.com/in/shubhamita-majumder-69264b30a/ |
 | Neha Pani | https://www.linkedin.com/in/neha-pani/ |
 | Protyush Banik | https://www.linkedin.com/in/protyush-banik/ |
